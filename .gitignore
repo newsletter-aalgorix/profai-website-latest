@@ -10,3 +10,5 @@ client/.env.development
 server/public
 vite.config.ts.*
 *.tar.gz
+
+.agents

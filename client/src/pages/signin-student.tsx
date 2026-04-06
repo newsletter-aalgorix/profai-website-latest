@@ -34,7 +34,28 @@ export default function SignInStudent() {
     setAuthError(null);
     
     try {
-      // Authenticate with backend database (supports both Firebase and traditional password users)
+      // First, authenticate with Firebase so we always have the latest password
+      await signInWithEmail(formData.email, formData.password);
+
+      // Sync the (possibly updated) password hash into our database
+      try {
+        await fetch('/api/update-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: formData.email,
+            newPassword: formData.password,
+          }),
+        });
+      } catch (syncError) {
+        console.error('Password sync error (non-fatal):', syncError);
+        // Do not block sign-in if sync fails; backend will still try with existing hash
+      }
+
+      // Authenticate with backend database (relies on up-to-date hash)
       const response = await fetch('/api/signin/student', {
         method: 'POST',
         headers: {

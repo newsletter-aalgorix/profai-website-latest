@@ -1152,16 +1152,9 @@ export async function registerRoutes(app: Express): Promise<void> {
         if (!verifyPassword(password, user.password)) {
           return res.status(401).json({ error: "Invalid credentials" });
         }
-      } else {
-        // For Firebase auth on existing user, update database password with Firebase UID
-        // This handles cases where user reset password via Firebase
-        const hashedPassword = hashPassword(firebaseUid);
-        await db
-          .update(users)
-          .set({ password: hashedPassword })
-          .where(eq(users.email, usernameOrEmail));
-        console.log(`[Firebase Auth] Synced database password for existing teacher: ${usernameOrEmail}`);
       }
+      // For Firebase auth (Google sign-in), we don't modify the existing password
+      // This allows users to sign in with both email/password AND Google
 
       // create session
       try {
@@ -1244,16 +1237,9 @@ export async function registerRoutes(app: Express): Promise<void> {
         if (!verifyPassword(password, user.password)) {
           return res.status(401).json({ error: "Invalid credentials" });
         }
-      } else {
-        // For Firebase auth on existing user, update database password with Firebase UID
-        // This handles cases where user reset password via Firebase
-        const hashedPassword = hashPassword(firebaseUid);
-        await db
-          .update(users)
-          .set({ password: hashedPassword })
-          .where(eq(users.email, usernameOrEmail));
-        console.log(`[Firebase Auth] Synced database password for existing student: ${usernameOrEmail}`);
       }
+      // For Firebase auth (Google sign-in), we don't modify the existing password
+      // This allows users to sign in with both email/password AND Google
 
       // create session
       try {
